@@ -1,0 +1,12 @@
+/.vscode
+/.idea
+/dist
+/node_modules
+/package-lock.json
+/.git
+/.env
+/dev.log
+/ormconfig.json
+/tempEntities
+/GeoIP2-City.mmdb
+/lib
