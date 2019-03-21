@@ -37,5 +37,11 @@
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "dependencies": {
+    "@types/node": "^11.11.4",
+    "pg": "^7.9.0",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.15"
+  }
 }
