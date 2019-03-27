@@ -39,7 +39,8 @@
     "tslint": "^5.10.0",
     "tslint-config-prettier": "^1.13.0",
     "typeorm": "^0.2.15",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.1",
+    "node-cache": "^4.2.0"
   },
   "files": [
     "lib/**/*"
