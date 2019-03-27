@@ -2,17 +2,16 @@
 import "reflect-metadata";
 import {createConnection, getManager} from "typeorm";
 
-/*export const Greeter = async (manager: any) => { 
+export const Greeter = async (manager: any) => { 
   let users = await manager.query("select * from freelotto.users limit 1");
   console.log(users);  
-};*/
+};
 
-export class freelottoAuth {
+export class FreelottoAuth {
   //private currentToken:any;
   private myCache:any;
 
-  contructor(cache:any ){
-    //this.currentToken = token;
+  contructor(cache:any){   
     this.myCache =  cache;
   }
 
