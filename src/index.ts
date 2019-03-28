@@ -4,7 +4,6 @@ import {createConnection, getManager} from "typeorm";
 
 
 export class FreelottoAuth {
-  //private currentToken:any;
   private myCache:any;
   private manager:any;
 
@@ -14,92 +13,115 @@ export class FreelottoAuth {
   public init(cache:any, manager:any){
     this.myCache = cache;
     this.manager = manager;
+    
+    return this;
   }
 
-  public verifyUserToken = async (token:string) => {    
-    let user =  this.myCache.get(token); 
+  public verifyUserToken = async (token?:string) => {
+    if(!token)
+      throw new Error("token not verified");    
     
-    if ( user == undefined ){  
+    let userToken =  this.myCache.get(token); 
+    //let userToken =  undefined; 
+    
+    if ( userToken == undefined ){  
      
-      let users = await this.manager
+      let userTokens = await this.manager
         .query(
           "select * from freelotto.user_token where token = $1",[token]
         );     
 
-      if(users.length > 0){          
-        let user = users[0];
-        let expiredTimestamp = new Date(user.expired_timestamp).getTime();
+      if(userTokens.length > 0){          
+        userToken = userTokens[0];
+        let expiredTimestamp = new Date(userToken.expired_timestamp).getTime();
         let currentTimestamp = new Date().getTime();
 
         if(expiredTimestamp > currentTimestamp){
           //console.log("found in DB and inserted into cache");
           let ttl = Math.floor((expiredTimestamp - currentTimestamp)/1000);      
 
-          let obj = { id: user.userid, type: "user"};
+          let obj = { id: userToken.user_id, type: "user"};
           this.myCache.set( token, obj, ttl );
-
-          return {id: user.userid};
+          //console.log("found in DB");
+          return {id: userToken.user_id};
         }
         else{
           //console.log("expired");
-          return false;
+          //return false;
+          throw new Error("token not verified");        
         }               
       }
       else{
         //console.log("no token in DB");
-        return false;
+        //return false;
+        throw new Error("token not verified");    
+    
       }
     }    
     else{      
-      if(user.type != "user") 
-        return false;
-
-      else 
-        return {id: user.userid};
+      if(userToken.type != "user"){ 
+        //return false;
+        throw new Error("token not verified");
+      }
+      else {
+        //console.log("found in cache");
+        return {id: userToken.id};
+      }
     }
 
   }
 
-  public verifyAdminToken = async (token:string) => {    
-    let admin =  this.myCache.get(token); 
-    
-    if ( admin == undefined ){  
-     
-      let admins = await this.manager
-      .query(
-        "select * from freelotto.admin_token where token = $1",[token]
-      );     
+  public verifyAdminToken = async (token?:string) => {    
+    if(!token)
+      throw new Error("token not verified");        
 
-      if(admins.length > 0){          
-        let admin = admins[0];
-        let expiredTimestamp = new Date(admin.expired_timestamp).getTime();
+    let adminToken =  this.myCache.get(token); 
+    //let adminToken = undefined;
+
+    if ( adminToken == undefined ){  
+     
+      let adminTokens = await this.manager
+        .query(
+          "select * from freelotto.admin_token where token = $1",[token]
+        );     
+
+      if(adminTokens.length > 0){          
+        adminToken = adminTokens[0];
+        let expiredTimestamp = new Date(adminToken.expired_timestamp).getTime();
         let currentTimestamp = new Date().getTime();
 
         if(expiredTimestamp > currentTimestamp){
           //console.log("found in DB and inserted into cache");
           let ttl = Math.floor((expiredTimestamp - currentTimestamp)/1000);      
 
-          let obj = { id: admin.userid, type: "admin"};
+          let obj = { id: adminToken.admin_id, type: "admin"};
           this.myCache.set( token, obj, ttl );
 
-          return {id: admin.userid};
+          //console.log("found in DB, token valid");
+          //console.log(admin);
+          return {id: adminToken.admin_id};
         }
         else{
           //console.log("expired");
-          return false;
+          throw new Error("token not verified");    
+          //return false;
         }               
       }
       else{
         //console.log("no token in DB");
-        return false;
+        //return false;
+        throw new Error("token not verified");    
       }
     }    
     else{      
-      if(admin.type != "admin") 
-        return false;
-
-      else 
-        return {id: admin.userid};
+      if(adminToken.type != "admin") {
+        //return false;
+        throw new Error("token not verified");    
+      }
+      else {
+        //console.log("found admin in cache");
+        return {id: adminToken.id};
+      }
     }
 
   }
